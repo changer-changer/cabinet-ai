@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "paul-graham-perspective": {
+      "source": "alchaincyf/paul-graham-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "659e0171e67f335185d3b1e7d32a7e033524b2faa75ed79850c12ca12d571044"
+    }
+  }
+}
