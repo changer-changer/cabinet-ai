@@ -3,7 +3,7 @@ name: "cabinet-ai"
 description: "TruthTeam多Agent架构：4-Agent认知进化系统。一键部署TruthSeeker、UserAvatar、EliteAdvisor、ExternalConnector，含完整用户资料库和被动监控。"
 ---
 
-# TruthTeam 多Agent架构 v3.0
+# TruthTeam 多Agent架构 v4.0
 
 ## 核心洞察
 
@@ -81,20 +81,32 @@ user-archive/
 │   └── external-connector.md
 │
 ├── 10-reports/                 # 生成报告
-│   ├── contradictions.md       # TruthSeeker矛盾点报告
-│   ├── elite-advisor/          # EliteAdvisor导师报告
-│   └── user-avatar/            # UserAvatar行动报告
+│   ├── contradictions.md       # TruthSeeker矛盾热力图（实时更新）
+│   ├── elite-advisor/          # EliteAdvisor巡视报告
+│   ├── user-avatar/            # UserAvatar行动报告
+│   ├── evolution/              # 季度认知进化报告
+│   └── red-team/               # 月度红队挑战报告
+│
+├── 11-decisions/               # 决策时间机器
+│   └── YYYY-MM/
+│       └── {decision-id}.md    # 重大决策快照
 │
 └── 99-meta/
-    └── scan-state.md           # TruthSeeker被动监控状态
+    ├── state-board.md          # 全局状态看板（团队共享记忆）
+    ├── last-updated.md         # 最新变更索引
+    ├── scan-state.md           # TruthSeeker扫描检查点
+    ├── evolution-log.md        # 季度认知进化日志
+    └── elite-advisor-last-round.md  # 上次巡视时间
 ```
 
 ### 读取优先级（所有Agent）
 
-1. **首次读取**：`INDEX.md` → `00-master-profile.md`
-2. **深度读取**：`01-profile/` 相关章节
-3. **行动前**：`02-projects/INDEX.md` 了解项目上下文
-4. **行动后**：更新 `09-agent-interactions/{your-id}.md`
+1. **启动时**：`99-meta/state-board.md`（了解"上次之后发生了什么"）
+2. **快速概览**：`00-master-profile.md`
+3. **深度读取**：`01-profile/` 相关章节 + 相关 `INDEX.md`
+4. **行动后**：更新 `99-meta/state-board.md` + `09-agent-interactions/{your-id}.md`
+
+**关键原则**：不要每次读全部档案。用 `state-board.md` + `INDEX.md` 导航。
 
 ### Git管理
 
@@ -241,6 +253,12 @@ EliteAdvisor 借鉴女娲skill的深度调研方法，对每个思维模型进�
 - UserAvatar：决策质量、目标制定合理性、主动性发挥
 - ExternalConnector：任务执行完整性、信息传递无损失、工具选择正确性
 
+**v4.0 新增能力**：
+- **主动巡视**：每12小时读取 state-board.md，扫描 session，识别问题，主动联系用户
+- **思维注入**：为其他 agent 创建临时思维透镜（`INJECTIONS/` 目录）
+- **红队模式**：每月对一个 agent 的输出进行对抗性挑战
+- **与 TruthSeeker 协作**：给建议前先通过 A2A 向 TruthSeeker 了解背景
+
 **监督触发**：
 - 自动汇报触发：每次UserAvatar或ExternalConnector完成重要行动后，自动汇报给EliteAdvisor
 - 定时检查：每12小时对所有Agent的工作进行回顾检查
@@ -328,8 +346,9 @@ OpenClaw 没有内置的"Agent发消息给Agent"工具。实际通信有三种�
 
 #### 1. 共享文件系统（最可靠）
 所有 Agent 读写 `~/.openclaw/workspace-truth-seeker/user-archive/`。
+- **核心共享文件**：`99-meta/state-board.md` — 所有 agent 启动时读取，行动后更新
 - 每个 Agent 维护自己的交互日志在 `09-agent-interactions/<agent-id>.md`
-- 行动前读取 `00-master-profile.md` 和 `INDEX.md`
+- 行动前读取 `state-board.md` + `00-master-profile.md` + 相关 `INDEX.md`
 
 #### 2. Bash 触发
 当一个 Agent 需要另一个 Agent 立即行动时：
@@ -464,26 +483,31 @@ openclaw cron add --name "<job-name>" --agent <id> --cron "<expr>" \
 
 ## 定时任务配置
 
-### Cron 任务（使用 `openclaw cron add`）
+### Cron 任务（直接写入 `~/.openclaw/cron/jobs.json`）
 
-```bash
-# TruthSeeker：每6小时被动监控扫描
-openclaw cron add --name "tt-truth-seeker-monitor" \
-  --agent truth-seeker --cron "0 */6 * * *" --session isolated \
-  --message "【被动监控扫描】读取99-meta/scan-state.md，扫描所有agent session和memory，检测矛盾点，写入10-reports/contradictions.md，更新scan-state" \
-  --description "TruthSeeker passive monitoring scan"
+install.sh 会自动将以下 cron jobs 写入 `~/.openclaw/cron/jobs.json`（幂等，按 name 去重）：
 
-# EliteAdvisor：每12小时定时指导
-openclaw cron add --name "tt-elite-advisor-check" \
-  --agent elite-advisor --cron "0 */12 * * *" --session isolated \
-  --message "【定时指导】读取用户资料库，检查所有agent记录，评估目标偏离风险，生成导师报告写入10-reports/elite-advisor/" \
-  --description "EliteAdvisor mentoring check"
+| Job Name | Agent | Schedule | Payload |
+|----------|-------|----------|---------|
+| tt-truth-seeker-monitor | truth-seeker | `0 */6 * * *` | 扫描新 session，检测矛盾，更新热力图 |
+| tt-elite-advisor-round | elite-advisor | `0 */12 * * *` | 读取 state-board，扫描 session，主动联系用户 |
+| tt-user-avatar-action | user-avatar | `0 6,18 * * *` | 读取 state-board，执行自主行动 |
 
-# UserAvatar：每12小时自主行动（与 EliteAdvisor 错开6小时）
-openclaw cron add --name "tt-user-avatar-action" \
-  --agent user-avatar --cron "0 6,18 * * *" --session isolated \
-  --message "【自主行动】读取用户资料库，搜集目标领域信息，检查项目进展，生成行动建议，如需执行则触发external-connector" \
-  --description "UserAvatar autonomous action"
+JSON 格式（OpenClaw 标准）：
+```json
+{
+  "version": 1,
+  "jobs": [{
+    "id": "uuid",
+    "name": "tt-truth-seeker-monitor",
+    "enabled": true,
+    "schedule": { "kind": "cron", "expr": "0 */6 * * *" },
+    "sessionTarget": "isolated",
+    "wakeMode": "now",
+    "payload": { "kind": "agentTurn", "message": "...", "lightContext": true },
+    "delivery": { "mode": "none" }
+  }]
+}
 ```
 
 ### 任务说明

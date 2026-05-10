@@ -18,7 +18,8 @@
 | `08-conversations/` | Conversation history summaries | Daily | - |
 | `09-agent-interactions/` | Agent interaction logs | Per interaction | - |
 | `10-reports/` | Generated reports (contradictions, mentoring) | Per report | - |
-| `99-meta/` | Scan state, git log, system metadata | Per scan | - |
+| `11-decisions/` | Decision Time Machine — major decision snapshots | Per decision | - |
+| `99-meta/` | State board, scan state, evolution log | Per action/scan | - |
 
 ## Status Overview
 
@@ -43,11 +44,14 @@
 
 ## For Agents: How to Use This Archive
 
-1. **First read**: Always start with `00-master-profile.md` for a quick overview
-2. **Deep dive**: Read relevant sections in `01-profile/` for detailed information
-3. **Before acting**: Check `02-projects/INDEX.md` for active project context
-4. **After acting**: Update `09-agent-interactions/{your-id}.md` with a summary
-5. **Commit changes**: Run `git add . && git commit -m "[{agent-id}] {summary}"`
+1. **On startup**: Read `99-meta/state-board.md` to understand what changed since your last session
+2. **Quick overview**: Read `00-master-profile.md` for a condensed user portrait
+3. **Deep dive**: Read relevant sections in `01-profile/` for detailed information
+4. **Before acting**: Check `02-projects/INDEX.md` for active project context
+5. **After acting**: Update `99-meta/state-board.md` with your block + `09-agent-interactions/{your-id}.md`
+6. **Commit changes**: Run `git add . && git commit -m "[{agent-id}] {summary}"`
+
+**Key principle**: Never read full archive on every session. Use `state-board.md` + relevant `INDEX.md` to navigate.
 
 ## Git Management
 
