@@ -38,3 +38,31 @@
 **教训**：`openclaw config set "key" "[$USER_PLATFORM_ID]"` 会存为字符串 `'[8434568597]'` 而非 JSON 数组 `[8434568597]`。
 
 **正确做法**：加 `--strict-json` 标志。
+
+---
+
+## 2026-05-10 — openclaw agent 没有 --session 参数
+
+**教训**：AGENTS.md 和 TOOLS.md 中的 A2A 命令写了 `--session isolated`，但 `openclaw agent` 没有这个参数。实际参数是 `--session-id <uuid>`。
+
+**验证方法**：`openclaw agent --help` 查看真实参数列表。
+
+**正确做法**：A2A 命令直接用 `openclaw agent --agent <id> --message "..."`，不需要 session 参数。
+
+---
+
+## 2026-05-10 — openclaw cron add 是真实 CLI
+
+**教训**：一开始以为没有 `openclaw cron add` CLI，所以直接写 JSON。实际上 CLI 存在且参数清晰。
+
+**验证方法**：`openclaw cron add --help` 查看参数。
+
+**正确做法**：用 `openclaw cron add --name ... --agent ... --cron ... --message ... --session isolated --light-context --wake now`。
+
+---
+
+## 2026-05-10 — openclaw agents list 输出格式
+
+**教训**：`openclaw agents list` 输出格式是 `- agent-id`（带 `- ` 前缀），不是纯 agent-id。grep 模式需要匹配实际格式。
+
+**正确做法**：`grep -oE '^- [a-z0-9-]+' | sed 's/^- //'`
