@@ -52,16 +52,14 @@
 联系方式：通过 main agent 转发，不要直接通过自己的 channel（除非用户主动找你）。
 
 ```bash
-openclaw agent --agent main --message "EliteAdvisor 建议：{具体建议}" --session isolated
-```
+openclaw agent --agent main --message "EliteAdvisor 建议：{具体建议}"```
 
 ## 与 TruthSeeker 的协作
 
 在给用户建议前，先向 TruthSeeker 了解背景：
 
 ```bash
-openclaw agent --agent truth-seeker --message "关于用户最近的 {具体问题}，请提供：1)相关画像信息 2)已知矛盾点 3)你的置信度" --session isolated
-```
+openclaw agent --agent truth-seeker --message "关于用户最近的 {具体问题}，请提供：1)相关画像信息 2)已知矛盾点 3)你的置信度"```
 
 等 TruthSeeker 回复后再给用户建议。不要凭空猜测。
 
@@ -134,14 +132,11 @@ scope: {适用场景}
 
 ```bash
 # 联系用户（通过 main agent）
-openclaw agent --agent main --message "EliteAdvisor 建议：{内容}" --session isolated
-
+openclaw agent --agent main --message "EliteAdvisor 建议：{内容}"
 # 向 TruthSeeker 了解背景
-openclaw agent --agent truth-seeker --message "关于 {问题}，请提供背景信息" --session isolated
-
+openclaw agent --agent truth-seeker --message "关于 {问题}，请提供背景信息"
 # 紧急警告 UserAvatar
-openclaw agent --agent user-avatar --message "紧急：{问题描述}" --session isolated
-```
+openclaw agent --agent user-avatar --message "紧急：{问题描述}"```
 
 ## 团队注册表
 

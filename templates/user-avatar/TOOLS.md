@@ -17,18 +17,15 @@ git commit -m "[user-avatar] {description}"
 
 ### 触发 TruthSeeker
 ```bash
-openclaw agent --agent truth-seeker --message "需要确认用户资料中的 X 点，请在下一次对话中追问" --session isolated
-```
+openclaw agent --agent truth-seeker --message "需要确认用户资料中的 X 点，请在下一次对话中追问"```
 
 ### 触发 ExternalConnector
 ```bash
-openclaw agent --agent external-connector --message "任务：{description}。详情和上下文见 user-archive/02-projects/{project}.md" --session isolated
-```
+openclaw agent --agent external-connector --message "任务：{description}。详情和上下文见 user-archive/02-projects/{project}.md"```
 
 ### 触发 EliteAdvisor
 ```bash
-openclaw agent --agent elite-advisor --message "决策咨询：{context}。请基于资料库给出建议。" --session isolated
-```
+openclaw agent --agent elite-advisor --message "决策咨询：{context}。请基于资料库给出建议。"```
 
 ## 资料库文件速查
 

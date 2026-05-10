@@ -77,14 +77,11 @@
 
 ```bash
 # 任务完成后通知 UserAvatar
-openclaw agent --agent user-avatar --message "任务完成：{summary}，结果写入 {路径}" --session isolated
-
+openclaw agent --agent user-avatar --message "任务完成：{summary}，结果写入 {路径}"
 # 发现矛盾时通知 TruthSeeker
-openclaw agent --agent truth-seeker --message "执行任务时发现与用户画像矛盾：{描述}" --session isolated
-
+openclaw agent --agent truth-seeker --message "执行任务时发现与用户画像矛盾：{描述}"
 # 紧急问题通知用户（通过 main agent）
-openclaw agent --agent main --message "ExternalConnector 紧急：{问题描述}" --session isolated
-```
+openclaw agent --agent main --message "ExternalConnector 紧急：{问题描述}"```
 
 ## 团队注册表
 

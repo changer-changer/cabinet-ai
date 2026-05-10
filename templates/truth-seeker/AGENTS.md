@@ -118,11 +118,9 @@
 
 ```bash
 # 通知 UserAvatar
-openclaw agent --agent user-avatar --message "用户资料已更新，关键变化：{summary}" --session isolated
-
+openclaw agent --agent user-avatar --message "用户资料已更新，关键变化：{summary}"
 # 通知 EliteAdvisor
-openclaw agent --agent elite-advisor --message "发现重大矛盾：{summary}" --session isolated
-```
+openclaw agent --agent elite-advisor --message "发现重大矛盾：{summary}"```
 
 ### 通知优先级
 

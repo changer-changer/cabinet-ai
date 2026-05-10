@@ -17,7 +17,7 @@ git commit -m "[elite-advisor] {description}"
 
 ### 紧急通知 UserAvatar
 ```bash
-openclaw agent --agent user-avatar --message "紧急：{warning}。建议立即关注。详情见 {report-path}" --session main
+openclaw agent --agent user-avatar --message "紧急：{warning}。建议立即关注。详情见 {report-path}"
 ```
 
 ## 资料库文件速查

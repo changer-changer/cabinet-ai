@@ -384,7 +384,7 @@ register_agents() {
     info "注册 Agent..."
 
     local EXISTING_AGENTS
-    EXISTING_AGENTS=$(capture_openclaw agents list 2>/dev/null | grep -oE '^[a-z0-9-]+' || true)
+    EXISTING_AGENTS=$(capture_openclaw agents list 2>/dev/null | grep -oE '^- [a-z0-9-]+' | sed 's/^- //' || true)
 
     if echo "$EXISTING_AGENTS" | grep -q "^truth-seeker$"; then
         info "TruthSeeker 已注册，跳过"
@@ -488,91 +488,51 @@ create_channel_accounts_and_bindings() {
 configure_cron() {
     info "配置定时任务（cron）..."
 
-    local CRON_DIR="$OPENCLAW_HOME/cron"
-    local CRON_FILE="$CRON_DIR/jobs.json"
-
-    run_cmd mkdir -p "$CRON_DIR"
-
-    run_node -e "
-        const fs = require('fs');
-        const path = '$CRON_FILE';
-
-        let existing = { version: 1, jobs: [] };
-        try {
-            const raw = fs.readFileSync(path, 'utf8');
-            existing = JSON.parse(raw);
-            if (!existing.jobs) existing.jobs = [];
-        } catch (e) {
-            // 文件不存在或格式错误
-        }
-
-        const newJobs = [
-            {
-                name: 'tt-truth-seeker-monitor',
-                description: 'TruthSeeker 6h scan: read session indices, detect contradictions, update heatmap',
-                agentId: 'truth-seeker',
-                cron: '0 */6 * * *',
-                message: '【被动监控】读取 99-meta/scan-state.md，扫描 agents/*/sessions/sessions.json 找新 session，读最后 20 行检测矛盾，更新 contradictions.md 和 state-board.md'
-            },
-            {
-                name: 'tt-elite-advisor-round',
-                description: 'EliteAdvisor 12h proactive supervision: read state-board, scan sessions, identify issues, outreach',
-                agentId: 'elite-advisor',
-                cron: '0 */12 * * *',
-                message: '【定时巡视】1)读99-meta/state-board.md 2)扫描agents/*/sessions找最近12h用户活动 3)读取相关session详情 4)如发现问题，向用户推送建议 5)生成报告写入10-reports/elite-advisor/ 6)更新99-meta/elite-advisor-last-round.md'
-            },
-            {
-                name: 'tt-user-avatar-action',
-                description: 'UserAvatar 12h autonomous action',
-                agentId: 'user-avatar',
-                cron: '0 6,18 * * *',
-                message: '【自主行动】读取99-meta/state-board.md和00-master-profile.md，执行预设目标相关行动，更新state-board.md'
-            }
-        ];
-
-        const existingNames = new Set(existing.jobs.map(j => j.name));
-        let added = 0;
-        for (const job of newJobs) {
-            if (existingNames.has(job.name)) {
-                console.log('SKIP: ' + job.name + ' already exists');
-                continue;
-            }
-            existing.jobs.push({
-                id: require('crypto').randomUUID(),
-                name: job.name,
-                description: job.description,
-                enabled: true,
-                createdAtMs: Date.now(),
-                schedule: { kind: 'cron', expr: job.cron },
-                sessionTarget: 'isolated',
-                wakeMode: 'now',
-                payload: {
-                    kind: 'agentTurn',
-                    message: job.message,
-                    lightContext: true
-                },
-                delivery: { mode: 'none' },
-                state: {}
-            });
-            added++;
-            console.log('ADDED: ' + job.name);
-        }
-
-        if (added > 0) {
-            fs.writeFileSync(path, JSON.stringify(existing, null, 2) + '\n');
-            console.log('Wrote ' + added + ' new cron jobs to ' + path);
-        } else {
-            console.log('No new cron jobs to add');
-        }
-    "
-
-    if [ "$DRY_RUN" = true ]; then
-        dry_run_info "验证 $CRON_FILE JSON 格式"
-    else
-        if ! node -e "JSON.parse(require('fs').readFileSync('$CRON_FILE', 'utf8'))" 2>/dev/null; then
-            error "cron/jobs.json 格式验证失败！"
-        fi
+    # 获取已有 cron jobs 的 name 列表（幂等检查）
+    local EXISTING_NAMES=""
+    if [ "$DRY_RUN" = false ]; then
+        EXISTING_NAMES=$(openclaw cron list --json 2>/dev/null | grep -oP '"name":\s*"\K[^"]+' || true)
     fi
+
+    add_cron_job() {
+        local name="$1"
+        local agent="$2"
+        local cron_expr="$3"
+        local message="$4"
+
+        if echo "$EXISTING_NAMES" | grep -q "^${name}$"; then
+            info "SKIP: $name 已存在"
+            return 0
+        fi
+
+        run_openclaw cron add \
+            --name "$name" \
+            --agent "$agent" \
+            --cron "$cron_expr" \
+            --message "$message" \
+            --session isolated \
+            --light-context \
+            --wake now
+        info "ADDED: $name"
+    }
+
+    add_cron_job \
+        "tt-truth-seeker-monitor" \
+        "truth-seeker" \
+        "0 */6 * * *" \
+        "【被动监控】读取 99-meta/scan-state.md，扫描 agents/*/sessions/sessions.json 找新 session，读最后 20 行检测矛盾，更新 contradictions.md 和 state-board.md"
+
+    add_cron_job \
+        "tt-elite-advisor-round" \
+        "elite-advisor" \
+        "0 */12 * * *" \
+        "【定时巡视】1)读99-meta/state-board.md 2)扫描agents/*/sessions找最近12h用户活动 3)读取相关session详情 4)如发现问题，向用户推送建议 5)生成报告写入10-reports/elite-advisor/ 6)更新99-meta/elite-advisor-last-round.md"
+
+    add_cron_job \
+        "tt-user-avatar-action" \
+        "user-avatar" \
+        "0 6,18 * * *" \
+        "【自主行动】读取99-meta/state-board.md和00-master-profile.md，执行预设目标相关行动，更新state-board.md"
 
     info "定时任务配置完成"
     info "TruthSeeker：每 6 小时被动监控扫描"

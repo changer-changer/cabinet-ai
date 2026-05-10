@@ -17,8 +17,7 @@ git commit -m "[truth-seeker] {description}"
 
 ### 通知 UserAvatar
 ```bash
-openclaw agent --agent user-avatar --message "用户资料已更新，关键变化：{summary}。请读取 00-master-profile.md 和 01-profile/ 相关章节。" --session isolated
-```
+openclaw agent --agent user-avatar --message "用户资料已更新，关键变化：{summary}。请读取 00-master-profile.md 和 01-profile/ 相关章节。"```
 
 ### 增量读取 Session JSONL
 ```bash

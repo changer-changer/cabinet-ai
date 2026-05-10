@@ -17,13 +17,11 @@ git commit -m "[external-connector] {description}"
 
 ### 通知 UserAvatar
 ```bash
-openclaw agent --agent user-avatar --message "任务完成：{summary}。结果已写入 {file-path}" --session isolated
-```
+openclaw agent --agent user-avatar --message "任务完成：{summary}。结果已写入 {file-path}"```
 
 ### 通知 TruthSeeker
 ```bash
-openclaw agent --agent truth-seeker --message "任务执行中发现与用户资料矛盾的信息：{summary}。请确认。" --session isolated
-```
+openclaw agent --agent truth-seeker --message "任务执行中发现与用户资料矛盾的信息：{summary}。请确认。"```
 
 ## 资料库文件速查
 

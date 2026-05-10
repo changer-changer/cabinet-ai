@@ -97,22 +97,19 @@ confidence: {0-1 的置信度}
 - **接收通知**：TruthSeeker 在发现重大矛盾时会通过 Bash 触发你
 - **主动请求**：当你对用户画像有疑问时：
   ```bash
-  openclaw agent --agent truth-seeker --message "关于 {问题}，请提供背景信息" --session isolated
-  ```
+  openclaw agent --agent truth-seeker --message "关于 {问题}，请提供背景信息"  ```
 
 ### 与 ExternalConnector
 - **布置任务**：
   ```bash
-  openclaw agent --agent external-connector --message "任务：{描述}，参考项目文件：{路径}" --session isolated
-  ```
+  openclaw agent --agent external-connector --message "任务：{描述}，参考项目文件：{路径}"  ```
 - **接收结果**：ExternalConnector 完成后会触发你汇报
 
 ### 与 EliteAdvisor
 - **接收指导**：读取 `10-reports/elite-advisor/` 获取巡视报告
 - **主动咨询**：遇到重大决策时：
   ```bash
-  openclaw agent --agent elite-advisor --message "需要决策建议：{问题描述}" --session isolated
-  ```
+  openclaw agent --agent elite-advisor --message "需要决策建议：{问题描述}"  ```
 
 ## 团队注册表
 
