@@ -41,11 +41,15 @@
    - Reasoning: TEAM_REGISTRY.md 不是标准 bootstrap 文件，不会自动加载
    - Impact: 团队注册表精简为表格放在 AGENTS.md
 
+4. **Cron JSON 写入逻辑测试通过**
+   - 验证项：幂等性（重复运行不增加 jobs）、保留已有 jobs、JSON 格式正确
+   - 结论：node 脚本逻辑可靠，可安全用于 install.sh
+
 ### Known Issues
 
 | Severity | Issue | Context | Next Step |
 |----------|-------|---------|-----------|
-| MEDIUM | 尚未测试 install.sh | cron JSON 写入逻辑是新的 | 需要端到端测试 |
+| MEDIUM | install.sh 尚未端到端测试 | 需要 OpenClaw Gateway 环境 | 在真实环境运行 `bash install.sh` |
 | LOW | IDENTITY.md 和 USER.md 仍是空模板 | 所有 agent workspace | 首次部署时由 agent 自动填充 |
 
 ---
@@ -55,8 +59,8 @@
 ### Immediate (Next Session)
 
 1. **[P0]** ~~Commit 所有改动~~ — 已完成 `2fc9486`
-2. **[P0]** 测试 install.sh 的 cron JSON 写入逻辑
-3. **[P0]** 验证所有 SOUL.md 不再包含操作规程
+2. **[P0]** ~~测试 install.sh 的 cron JSON 写入逻辑~~ — 已验证：幂等性、保留已有 jobs、JSON 格式正确
+3. **[P0]** ~~验证所有 SOUL.md 不再包含操作规程~~ — 已验证：只有 elite-advisor 有一条引导原则（合理）
 
 ### Short Term
 

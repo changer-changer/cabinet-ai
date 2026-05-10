@@ -16,6 +16,32 @@
 set -e
 
 # ============================================
+# 颜色定义和基础函数（必须在参数解析之前）
+# ============================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+info() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+    exit 1
+}
+
+dry_run_info() {
+    echo -e "${BLUE}[DRY-RUN]${NC} $1"
+}
+
+# ============================================
 # 参数解析
 # ============================================
 DRY_RUN=false
@@ -33,7 +59,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         *)
-            echo "[WARN] 未知参数: $1"
+            warn "未知参数: $1"
             shift
             ;;
     esac
@@ -65,32 +91,6 @@ cleanup() {
 }
 
 # ============================================
-# 颜色定义
-# ============================================
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
-
-warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-    exit 1
-}
-
-dry_run_info() {
-    echo -e "${BLUE}[DRY-RUN]${NC} $1"
-}
-
-# ============================================
 # 命令包装函数
 # ============================================
 
@@ -98,6 +98,11 @@ dry_run_info() {
 run_cmd() {
     if [ "$DRY_RUN" = true ]; then
         dry_run_info "$*"
+        # 在临时目录模式下实际执行（文件操作在隔离目录中，安全）
+        # 这样 node 脚本等后续依赖可以正常验证
+        if [ "$TEMP_HOME_CREATED" = true ]; then
+            "$@"
+        fi
     else
         "$@"
     fi
@@ -349,6 +354,7 @@ create_user_archive() {
 
     local ARCHIVE_DIR="$OPENCLAW_HOME/workspace-truth-seeker/user-archive"
 
+    run_cmd mkdir -p "$ARCHIVE_DIR"
     run_cmd cp -r "$TEMP_DIR/user-archive/"* "$ARCHIVE_DIR/"
 
     # Git 初始化
