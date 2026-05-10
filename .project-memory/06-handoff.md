@@ -22,9 +22,9 @@
 
 ### Current State
 
-**Project Health**: `green` — v4.0 已提交，准备测试
+**Project Health**: `green` — v4.0 已提交 + dry-run 测试通过
 
-**Last Commit**: `2fc9486` — 26 files changed
+**Last Commit**: `c47f195` — 3 commits on top of v3.0
 **Uncommitted**: 无（工作区干净）
 
 ### Key Decisions Made
@@ -49,7 +49,7 @@
 
 | Severity | Issue | Context | Next Step |
 |----------|-------|---------|-----------|
-| MEDIUM | install.sh 尚未端到端测试 | 需要 OpenClaw Gateway 环境 | 在真实环境运行 `bash install.sh` |
+| LOW | install.sh 尚未真实部署 | dry-run 已通过，需真实 Gateway 环境验证 | 用户决定是否执行 `bash install.sh` |
 | LOW | IDENTITY.md 和 USER.md 仍是空模板 | 所有 agent workspace | 首次部署时由 agent 自动填充 |
 
 ---
@@ -61,6 +61,7 @@
 1. **[P0]** ~~Commit 所有改动~~ — 已完成 `2fc9486`
 2. **[P0]** ~~测试 install.sh 的 cron JSON 写入逻辑~~ — 已验证：幂等性、保留已有 jobs、JSON 格式正确
 3. **[P0]** ~~验证所有 SOUL.md 不再包含操作规程~~ — 已验证：只有 elite-advisor 有一条引导原则（合理）
+4. **[P0]** ~~install.sh dry-run 端到端测试~~ — 已通过：全流程 12 步验证通过，cron 幂等性通过
 
 ### Short Term
 
