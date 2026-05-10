@@ -1,6 +1,6 @@
 # Project Changelog
 
-## 2026-05-10 — v4.0 模板重构
+## 2026-05-10 — v4.0 模板重构 (commit `2fc9486`)
 
 ### SOUL.md / AGENTS.md 职责分离
 - **What**: 调查了 OpenClaw 源码，确认 8 个 bootstrap 文件的加载机制和职责分工
