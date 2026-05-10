@@ -11,6 +11,10 @@
 
 set -e
 
+# 错误处理：发生错误时显示友好信息
+trap 'error "安装脚本在 $LINENO 行出错。如需回滚，检查 openclaw.json.bak"' ERR
+trap 'rm -rf "${TEMP_DIR:-}"' EXIT
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -93,6 +97,16 @@ ask_user_config() {
             ;;
     esac
 
+    # 询问用户的平台ID（用于allowlist）
+    if [ "$PLATFORM" != "other" ]; then
+        echo ""
+        read -p "你的 $PLATFORM 用户ID (用于消息白名单，如 Telegram numeric ID): " USER_PLATFORM_ID
+        while [ -z "$USER_PLATFORM_ID" ]; do
+            warn "用户ID不能为空，否则Agent无法接收你的消息"
+            read -p "你的 $PLATFORM 用户ID: " USER_PLATFORM_ID
+        done
+    fi
+
     # 询问 botToken
     if [ "$PLATFORM" != "other" ]; then
         echo ""
@@ -120,7 +134,18 @@ ask_user_config() {
     fi
 }
 
-# 渲染模板
+# 备份 openclaw.json
+backup_openclaw_config() {
+    local CONFIG_FILE="$HOME/.openclaw/openclaw.json"
+    if [ -f "$CONFIG_FILE" ]; then
+        cp "$CONFIG_FILE" "$CONFIG_FILE.bak"
+        info "openclaw.json 已备份到 $CONFIG_FILE.bak"
+    else
+        warn "未找到 $CONFIG_FILE，跳过备份"
+    fi
+}
+
+# 渲染模板（安全替换，处理特殊字符）
 render_templates() {
     info "渲染模板..."
 
@@ -130,11 +155,16 @@ render_templates() {
     # 复制模板
     cp -r "$SCRIPT_DIR/templates/"* "$TEMP_DIR/"
 
-    # 替换变量
+    # 安全替换：使用 awk 避免 sed 的转义问题
+    # 将变量中的 / 转义为 \/ 以用于 sed
+    SAFE_TEAM_NAME=$(printf '%s' "$TEAM_NAME" | sed 's/[&/\]/\\&/g')
+    SAFE_USER_NAME=$(printf '%s' "$USER_NAME" | sed 's/[&/\]/\\&/g')
+    SAFE_PLATFORM=$(printf '%s' "$PLATFORM" | sed 's/[&/\]/\\&/g')
+
     find "$TEMP_DIR" -type f -name "*.md" -exec sed -i \
-        -e "s/{{TEAM_NAME}}/$TEAM_NAME/g" \
-        -e "s/{{USER_NAME}}/$USER_NAME/g" \
-        -e "s/{{PLATFORM}}/$PLATFORM/g" \
+        -e "s/{{TEAM_NAME}}/$SAFE_TEAM_NAME/g" \
+        -e "s/{{USER_NAME}}/$SAFE_USER_NAME/g" \
+        -e "s/{{PLATFORM}}/$SAFE_PLATFORM/g" \
         {} +
 
     info "模板渲染完成"
@@ -262,22 +292,22 @@ create_channel_accounts_and_bindings() {
     info "创建 TruthSeeker account..."
     openclaw config set "channels.$PLATFORM.accounts.truth-seeker.botToken" "$TRUTH_SEEKER_TOKEN"
     openclaw config set "channels.$PLATFORM.accounts.truth-seeker.dmPolicy" "allowlist"
-    openclaw config set "channels.$PLATFORM.accounts.truth-seeker.allowFrom" '[8434568597]'
+    openclaw config set "channels.$PLATFORM.accounts.truth-seeker.allowFrom" "[$USER_PLATFORM_ID]"
 
     info "创建 UserAvatar account..."
     openclaw config set "channels.$PLATFORM.accounts.user-avatar.botToken" "$USER_AVATAR_TOKEN"
     openclaw config set "channels.$PLATFORM.accounts.user-avatar.dmPolicy" "allowlist"
-    openclaw config set "channels.$PLATFORM.accounts.user-avatar.allowFrom" '[8434568597]'
+    openclaw config set "channels.$PLATFORM.accounts.user-avatar.allowFrom" "[$USER_PLATFORM_ID]"
 
     info "创建 EliteAdvisor account..."
     openclaw config set "channels.$PLATFORM.accounts.elite-advisor.botToken" "$ELITE_ADVISOR_TOKEN"
     openclaw config set "channels.$PLATFORM.accounts.elite-advisor.dmPolicy" "allowlist"
-    openclaw config set "channels.$PLATFORM.accounts.elite-advisor.allowFrom" '[8434568597]'
+    openclaw config set "channels.$PLATFORM.accounts.elite-advisor.allowFrom" "[$USER_PLATFORM_ID]"
 
     info "创建 ExternalConnector account..."
     openclaw config set "channels.$PLATFORM.accounts.external-connector.botToken" "$EXTERNAL_CONNECTOR_TOKEN"
     openclaw config set "channels.$PLATFORM.accounts.external-connector.dmPolicy" "allowlist"
-    openclaw config set "channels.$PLATFORM.accounts.external-connector.allowFrom" '[8434568597]'
+    openclaw config set "channels.$PLATFORM.accounts.external-connector.allowFrom" "[$USER_PLATFORM_ID]"
 
     # 配置 bindings（幂等：读取现有，追加缺失）
     info "配置 bindings..."
@@ -481,6 +511,7 @@ main() {
     check_openclaw
     check_gateway
     ask_user_config
+    backup_openclaw_config
     render_templates
     create_workspaces
     create_user_archive
@@ -531,9 +562,6 @@ main() {
     echo "  - 如果需要回滚，查看 openclaw.json.bak 备份文件"
     echo "  - 定时任务在 Gateway 重启后自动生效"
     echo ""
-
-    # 清理临时目录
-    rm -rf "$TEMP_DIR"
 }
 
 # 执行主函数

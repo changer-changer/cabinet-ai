@@ -55,7 +55,7 @@ Add TruthTeam: 4-Agent Cognitive Evolution System with Passive Monitoring & 8 Th
 - **双重身份**：既是人生导师，也是工作伙伴
 
 #### 🧠 EliteAdvisor — 顶级导师团
-- **8 个可切换思维模型**：Musk（第一性原理）、Bezos（逆向工作）、黄仁勋（算力视角）、张一鸣（信息效率）、Jobs（极致简洁）、Buffett（安全边际）、Thiel（垄断思维）、Munger（多元模型）
+- **借鉴女娲skill的思维模型蒸馏方式**：每个思维模型都经过完整操作系统级蒸馏（心智模型、决策启发式、表达DNA、经典错误），不是标签，是真正的思维附体
 - **主动监督**：每 12 小时全面检查所有 Agent 工作质量
 - **风险预警**：检测到目标偏离或决策质量下降时立即介入
 
@@ -68,7 +68,7 @@ Add TruthTeam: 4-Agent Cognitive Evolution System with Passive Monitoring & 8 Th
 
 1. **完整用户资料库**：从单文件到 35+ 文件的档案系统，含 12 章画像、项目档案、关系图谱、对话历史、Git 版本控制
 2. **被动监控**：TruthSeeker 7×24 小时后台扫描，主动发现"今天的你和昨天的你说得不一致"
-3. **8 个顶级思维模型**：内置可切换导师团，根据问题类型调用最合适的思考方式
+3. **借鉴女娲skill的思维模型蒸馏方式**：内置可切换导师团，每个模型都是完整的思维操作系统，根据问题类型自动调用
 4. **独立性原则**：TruthSeeker 有独立判断权，会基于证据得出与用户不同的结论
 5. **四种对话模式**：探索模式 → 执行模式 → 决策模式 → 更新模式，无缝切换
 
@@ -87,7 +87,7 @@ bash <(curl -s https://raw.githubusercontent.com/changer-changer/cabinet-ai/main
 
 - ✅ 一键部署 4 个专职 Agent + 完整档案系统
 - ✅ 被动监控（每 6 小时自动扫描）
-- ✅ 8 个可切换顶级思维模型
+- ✅ 借鉴女娲skill思维模型蒸馏方式的导师系统
 - ✅ Git 版本控制（自动提交）
 - ✅ 3 个定时任务（监控 + 指导 + 自主行动）
 - ✅ 基于 OpenClaw 原生功能，无需外部 API

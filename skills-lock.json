@@ -6,6 +6,46 @@
       "sourceType": "github",
       "skillPath": "SKILL.md",
       "computedHash": "659e0171e67f335185d3b1e7d32a7e033524b2faa75ed79850c12ca12d571044"
+    },
+    "elon-musk-perspective": {
+      "source": "changer-changer/elon-musk-perspective",
+      "sourceType": "github",
+      "skillPath": "SKILL.md"
+    },
+    "zhang-yiming-perspective": {
+      "source": "changer-changer/zhang-yiming-perspective",
+      "sourceType": "github",
+      "skillPath": "SKILL.md"
+    },
+    "steve-jobs-perspective": {
+      "source": "changer-changer/steve-jobs-perspective",
+      "sourceType": "github",
+      "skillPath": "SKILL.md"
+    },
+    "munger-perspective": {
+      "source": "changer-changer/munger-perspective",
+      "sourceType": "github",
+      "skillPath": "SKILL.md"
+    },
+    "andrej-karpathy-perspective": {
+      "source": "changer-changer/andrej-karpathy-perspective",
+      "sourceType": "github",
+      "skillPath": "SKILL.md"
+    },
+    "ilya-sutskever-perspective": {
+      "source": "changer-changer/ilya-sutskever-perspective",
+      "sourceType": "github",
+      "skillPath": "SKILL.md"
+    },
+    "mrbeast-perspective": {
+      "source": "changer-changer/mrbeast-perspective",
+      "sourceType": "github",
+      "skillPath": "SKILL.md"
+    },
+    "trump-perspective": {
+      "source": "changer-changer/trump-perspective",
+      "sourceType": "github",
+      "skillPath": "SKILL.md"
     }
   }
 }

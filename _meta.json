@@ -1,7 +1,7 @@
 {
   "name": "cabinet-ai",
-  "version": "2.0.0",
-  "description": "内阁AI团队架构：4-Agent认知进化系统",
+  "version": "3.0.0",
+  "description": "TruthTeam AI内阁团队：4-Agent认知进化系统，借鉴女娲skill思维模型蒸馏方式",
   "author": "Walker Jesse",
   "install": {
     "script": "install.sh",
