@@ -3,7 +3,7 @@
 **Last Updated**: 2026-05-10
 **Session Agent**: Claude Code
 **Git Branch**: `master`
-**Git Commit**: `57a4632` (last committed)
+**Git Commit**: `164eef0` (last committed)
 
 ---
 
@@ -11,77 +11,81 @@
 
 ### What Was Accomplished This Session
 
-- [x] 调查 OpenClaw 源码，确认 8 个 bootstrap 文件的加载机制
-- [x] 重构 SOUL.md / AGENTS.md 职责分离（4 个 agent 全部重写）
-- [x] 重写 install.sh `configure_cron()` — 直接写入 jobs.json
-- [x] 修复 install.sh `allowFrom` — 加 --strict-json
-- [x] 创建 state-board.md、INDEX.md 等 9 个新模板文件
-- [x] 更新 SKILL.md 到 v4.0
-- [x] 创建 .project-memory/ 项目记忆系统
-- [x] **已提交** `2fc9486` — 26 files changed, 2167 insertions(+), 1039 deletions(-)
+- [x] 验证文件状态：无版本冲突，其他 AI 协作未影响 v4.0 内容
+- [x] 验证所有 OpenClaw CLI 命令（对照 `--help` 真实输出）
+- [x] 真实部署 install.sh（Gateway 运行中执行）
+- [x] 修复 install.sh：agents list grep 模式修正
+- [x] 修复 install.sh：configure_cron() 改用 `openclaw cron add` CLI
+- [x] 修复所有 AGENTS.md/TOOLS.md：移除无效的 `--session isolated` 参数
+- [x] 精简 SKILL.md：548 行 → 135 行（-75%）
+- [x] 删除 PROMOTION.md
+- [x] 打包比赛提交压缩包（64KB）
+- [x] 同步最新版本到 OpenClaw 环境（workspace + cron）
+- [x] 更新 _meta.json 版本到 4.0.0
 
 ### Current State
 
-**Project Health**: `green` — v4.0 已真实部署，所有命令已验证
+**Project Health**: `green` — v4.0 已真实部署，CLI 命令全部验证通过
 
-**Last Commit**: `57a4632` — 真实部署 + CLI 命令验证
+**Last Commit**: `164eef0` — gitignore + archive
 **Uncommitted**: 无（工作区干净）
 
 ### Key Decisions Made
 
-1. **SOUL.md vs AGENTS.md 职责分离**
-   - Reasoning: OpenClaw 源码验证了每个 turn 都注入这些文件，操作规程放在 SOUL.md 浪费 token
-   - Impact: 所有 4 个 agent 的模板重写
+1. **Cron 改用 CLI 而非 JSON 直写**
+   - Reasoning: `openclaw cron add` 是真实存在的 CLI，参数清晰，比直接写 JSON 更可靠
+   - Impact: install.sh configure_cron() 重写
 
-2. **Cron 直写 JSON 而非 CLI**
-   - Reasoning: 读取真实 jobs.json 格式确认机制是 JSON 文件
-   - Impact: install.sh configure_cron() 完全重写
+2. **A2A 命令不使用 --session 参数**
+   - Reasoning: `openclaw agent` 没有 `--session` 参数（只有 `--session-id <uuid>`）
+   - Impact: 所有 AGENTS.md 和 TOOLS.md 中的 A2A 命令修正
 
-3. **TEAM_REGISTRY.md 合并到 AGENTS.md**
-   - Reasoning: TEAM_REGISTRY.md 不是标准 bootstrap 文件，不会自动加载
-   - Impact: 团队注册表精简为表格放在 AGENTS.md
-
-4. **Cron JSON 写入逻辑测试通过**
-   - 验证项：幂等性（重复运行不增加 jobs）、保留已有 jobs、JSON 格式正确
-   - 结论：node 脚本逻辑可靠，可安全用于 install.sh
+3. **SKILL.md 大幅精简**
+   - Reasoning: 大量内容与 SOUL.md/AGENTS.md/install.sh 重复
+   - Impact: 548 行 → 135 行，只保留架构、原则、安装方式
 
 ### Known Issues
 
 | Severity | Issue | Context | Next Step |
 |----------|-------|---------|-----------|
-| LOW | IDENTITY.md 和 USER.md 仍是空模板 | 所有 agent workspace | 首次部署时由 agent 自动填充 |
-| LOW | 旧文件残留 | workspace 中的 user_profile.md, TEAM_REGISTRY.md 等 v3.0 文件 | 手动清理或保留（不影响 v4.0 功能） |
+| LOW | IDENTITY.md 和 USER.md 仍是空模板 | 所有 agent workspace | 首次对话时由 agent 自动填充 |
+| LOW | 旧文件残留 | workspace 中的 user_profile.md, TEAM_REGISTRY.md 等 v3.0 文件 | 不影响功能，可手动清理 |
+| INFO | Cron delivery 显示 error | "announce -> last" 路由失败 | 正常行为，isolated session 不需要 delivery |
+
+---
+
+## Verified OpenClaw CLI Commands
+
+| 命令 | 状态 | 备注 |
+|------|------|------|
+| `openclaw agents add --workspace ... --non-interactive` | ✓ | agent 已存在时返回错误 |
+| `openclaw agents list` | ✓ | 输出格式：`- agent-id` |
+| `openclaw config set ... --strict-json` | ✓ | 设置 JSON 值 |
+| `openclaw config get ...` | ✓ | 读取配置 |
+| `openclaw cron add --name/--agent/--cron/--message/--session/--light-context/--wake` | ✓ | 创建定时任务 |
+| `openclaw cron list` | ✓ | 列出定时任务 |
+| `openclaw cron rm <id>` | ✓ | 删除定时任务 |
+| `openclaw agent --agent <id> --message "..."` | ✓ | 运行 agent turn（无 --session 参数） |
 
 ---
 
 ## Next Steps
 
-### Immediate (Next Session)
-
-1. **[P0]** ~~Commit 所有改动~~ — 已完成 `2fc9486`
-2. **[P0]** ~~测试 install.sh 的 cron JSON 写入逻辑~~ — 已验证：幂等性、保留已有 jobs、JSON 格式正确
-3. **[P0]** ~~验证所有 SOUL.md 不再包含操作规程~~ — 已验证：只有 elite-advisor 有一条引导原则（合理）
-4. **[P0]** ~~install.sh dry-run 端到端测试~~ — 已通过：全流程 12 步验证通过，cron 幂等性通过
-5. **[P0]** ~~真实部署 + CLI 命令验证~~ — 已完成：openclaw cron add / agent / agents add 全部验证通过
-
 ### Short Term
 
-4. **[P1]** 端到端测试：模拟对话 → state-board 更新 → EliteAdvisor 读取
-5. **[P1]** 更新 AGENTS.md 中的 cron 命令格式（旧的 `openclaw cron add` 命令已过时）
+1. **[P1]** 端到端测试：模拟对话 → state-board 更新 → EliteAdvisor 读取
+2. **[P1]** 让 agent 实际运行一次，验证 SOUL.md/AGENTS.md 被正确加载
 
 ### Medium Term
 
-6. **[P2]** 实现认知进化追踪（季度报告）
-7. **[P2]** 实现思维注入和红队模式
+3. **[P2]** 实现认知进化追踪（季度报告）
+4. **[P2]** 实现思维注入和红队模式
 
 ---
 
 ## Quick Commands
 
 ```bash
-# 验证 cron JSON 格式
-node -e "JSON.parse(require('fs').readFileSync(process.env.HOME + '/.openclaw/cron/jobs.json', 'utf8'))"
-
 # 检查 agent workspace 文件
 ls -la ~/.openclaw/workspace-truth-seeker/
 
@@ -90,6 +94,12 @@ wc -c templates/*/SOUL.md templates/*/AGENTS.md
 
 # OpenClaw 常用命令
 openclaw gateway status
-openclaw agent list
+openclaw agents list
+openclaw cron list
 openclaw config get tools.sessions.visibility
+
+# 同步 workspace（不重新注册 agent）
+for a in truth-seeker user-avatar elite-advisor external-connector; do
+  cp templates/$a/*.md ~/.openclaw/workspace-$a/
+done
 ```

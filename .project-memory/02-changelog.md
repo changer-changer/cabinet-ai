@@ -1,6 +1,6 @@
 # Project Changelog
 
-## 2026-05-10 — v4.0 模板重构 (commit `2fc9486`)
+## 2026-05-10 — v4.0 模板重构 (commits `2fc9486`..`164eef0`)
 
 ### SOUL.md / AGENTS.md 职责分离
 - **What**: 调查了 OpenClaw 源码，确认 8 个 bootstrap 文件的加载机制和职责分工
@@ -15,16 +15,33 @@
 - TEAM_REGISTRY.md 不是标准文件，不会自动加载
 - 每文件上限 12,000 字符，总计上限 60,000 字符
 
-### install.sh 重写
-- **What**: `configure_cron()` 从 `openclaw cron add` CLI 改为直接写入 `~/.openclaw/cron/jobs.json`
-- **Why**: 真实的 OpenClaw cron 机制是 JSON 文件，不是 CLI 命令
-- **How**: 用 node 做 JSON 合并，按 name 幂等去重
+### install.sh 修复
+- **configure_cron()**: 改用 `openclaw cron add` CLI（非 JSON 直写）
+- **agents list**: grep 模式修正（`'^- [a-z0-9-]+'`）
+- **allowFrom**: 所有配置加 `--strict-json`
+
+### CLI 命令验证（对照 `--help` 真实输出）
+- `openclaw cron add --name/--agent/--cron/--message/--session/--light-context/--wake` ✓
+- `openclaw agent --agent <id> --message "..."` ✓（无 --session 参数）
+- `openclaw agents list` 输出格式：`- agent-id`
+
+### A2A 命令修正
+- 所有 AGENTS.md/TOOLS.md 中的 `--session isolated` 移除（参数不存在）
+
+### SKILL.md 精简
+- 548 行 → 135 行（-75%），删除与 SOUL.md/AGENTS.md 重复的内容
 
 ### 新模板文件
 - `99-meta/state-board.md` — 全局状态看板
 - `99-meta/last-updated.md`, `evolution-log.md`, `elite-advisor-last-round.md`
 - `01-profile/INDEX.md`, `10-reports/INDEX.md`, `11-decisions/INDEX.md`, `99-meta/INDEX.md`
 - `11-decisions/` 目录 + 决策快照模板
+
+### 真实部署
+- 4 个 agent workspace 已更新到 v4.0
+- user-archive 已创建（37 个文件，git 已初始化）
+- 3 个 cron job 已创建
+- 比赛提交压缩包：64KB
 
 ---
 
